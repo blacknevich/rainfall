@@ -1,6 +1,8 @@
+Rainfall.iso
+.DS_Store
 *.dat
 *.bak
 *.prp
 *.gbf
 *.gpr
-*.rep/*
+./binaries/rainfall.rep
