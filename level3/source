@@ -1,5 +1,4 @@
 void v(void)
-
 {
   char local_20c [520];
   

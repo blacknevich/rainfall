@@ -1,8 +1,11 @@
-void p(void)
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 
+void p(void)
 {
   uint unaff_retaddr;
-  char local_50 [76];
+  char local_50 [64]; //ghidra снова пишет 76 - может она просто сразу офсет считает
   
   fflush(stdout);
   gets(local_50);
@@ -17,7 +20,6 @@ void p(void)
 }
 
 void main(void)
-
 {
   p();
   return;
