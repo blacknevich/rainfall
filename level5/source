@@ -1,5 +1,6 @@
-void o(void)
+#include <stdio.h>
 
+void o(void)
 {
   system("/bin/sh");
                     /* WARNING: Subroutine does not return */

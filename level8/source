@@ -1,5 +1,11 @@
-undefined4 main(void)
+#include <stdio.h>
+#include <string.h>
+#include <stdlib.h>
 
+char	*auth = NULL;
+char	*service = NULL;
+
+undefined4 main(void)
 {
   char cVar1;
   char *pcVar2;
