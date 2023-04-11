@@ -1,3 +1,59 @@
+#include <cstring>
+
+class N {
+public:
+    N(int x) {
+        some_value = 42; // set some default value
+        setAnnotation("Default annotation"); // set some default annotation
+    }
+
+    void setAnnotation(char* annotation) {
+        std::memcpy(some_annotation, annotation, std::strlen(annotation) + 1);
+    }
+
+    N operator+(N& other) {
+        N result(0);
+        result.some_value = some_value + other.some_value;
+        return result;
+    }
+
+    N operator-(N& other) {
+        N result(0);
+        result.some_value = some_value - other.some_value;
+        return result;
+    }
+
+private:
+    int some_value;
+    char some_annotation[100];
+};
+
+#include <iostream>
+#include <cstring>
+
+void main(int param_1,int param_2)
+{
+  N *this;
+  undefined4 *this_00;
+  
+  if (param_1 < 2) {
+                    /* WARNING: Subroutine does not return */
+    _exit(1);
+  }
+  this = (N *)operator.new(0x6c); //first object new
+  N::N(this,5);
+  this_00 = (undefined4 *)operator.new(0x6c); second object new
+  N::N((N *)this_00,6);
+  N::setAnnotation(this,*(char **)(param_2 + 4)); //av[1] with 1st object
+  (**(code **)*this_00)(this_00,this); function is called from the second object
+  return;
+}
+
+
+
+
+
+/*ghidra class enerpreteur
 /* __static_initialization_and_destruction_0(int, int) */
 
 void __static_initialization_and_destruction_0(int param_1,int param_2)
@@ -47,21 +103,4 @@ void __thiscall N::setAnnotation(N *this,char *param_1)
   memcpy(this + 4,param_1,__n);
   return;
 }
-
-void main(int param_1,int param_2)
-{
-  N *this;
-  undefined4 *this_00;
-  
-  if (param_1 < 2) {
-                    /* WARNING: Subroutine does not return */
-    _exit(1);
-  }
-  this = (N *)operator.new(0x6c);
-  N::N(this,5);
-  this_00 = (undefined4 *)operator.new(0x6c);
-  N::N((N *)this_00,6);
-  N::setAnnotation(this,*(char **)(param_2 + 4)); //av[1]
-  (**(code **)*this_00)(this_00,this);
-  return;
-}
+*/

@@ -4,13 +4,14 @@
 void p(char *param_1,char *param_2)
 {
   char *pcVar1;
-  char local_100c [4104];
+  char local_100c [4104]; //space for shellcode deposition
   
   puts(param_2);
   read(0,local_100c,0x1000);
   pcVar1 = strchr(local_100c,10); //\n to /0
   *pcVar1 = '\0';
-  strncpy(param_1,local_100c,0x14);
+  ///////////no \0 here
+  strncpy(param_1,local_100c,0x14); //20 symbols
   return;
 }
 
@@ -38,7 +39,7 @@ void pp(char *param_1)
   } while (cVar1 != '\0');
 
   *(undefined2 *)(param_1 + (~uVar2 - 1)) = 0x20; //space at the end
-  strcat(param_1,local_20);
+  strcat(param_1,local_20); // arg1arg2+arg2
   return;
 }
 

